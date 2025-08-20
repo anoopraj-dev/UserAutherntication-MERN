@@ -1,11 +1,22 @@
 import express from 'express';
+import dotenv from 'dotenv'
 import userRouter from './routes/userRoutes.js';
-import userAuth from './authentication/userAuth.js'
+import userAuth from './authentication/userAuth.js';
+import cors from 'cors';
+import helmet from 'helmet';
+
+dotenv.config();
 
 const app = express();
-
+const clientUrl = process.env.CLIENT_URL
 //middlewares
 app.use(express.json())
+
+app.use(cors({
+    origin: clientUrl
+}));
+
+app.use(helmet());
 
 //routes
 app.use('/user',userRouter);
