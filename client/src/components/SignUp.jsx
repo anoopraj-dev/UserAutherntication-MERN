@@ -4,9 +4,9 @@ import { useState } from "react";
 
 function SignUp() {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [newUser,setNewuser] = useState(false);
+  const [mode, setMode] = useState(true);
 
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -19,7 +19,7 @@ function SignUp() {
 
     try {
       setLoading(true);
-      setError(false);
+      setError("");
       const res = await fetch(SIGNUP_URL, {
         method: "POST",
         headers: {
@@ -29,61 +29,93 @@ function SignUp() {
       });
       const data = await res.json();
       setLoading(false);
-      if(data.success===false){
-        setError(true);
+
+      if (!res.ok) {
+        setError(data.message || "Something went wrong");
         return;
       }
-
     } catch (error) {
       setLoading(false);
-      setError(true)
+      setError("Network error. Please try again!");
     }
   };
 
-
-  const handleSignin =()=>{
-    setNewuser((prev)=>!prev)
-    console.log(newUser)
-  }
+  const handleSignin = () => {
+    setMode((prev)=>!prev);
+    setFormData({});
+    setError("");
+  };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <h1 className="font-bold text-3xl text-center my-7">{!newUser ? 'Sign Up': 'Sign In'}</h1>
+      <h1 className="font-bold text-3xl text-center my-7">
+        {mode ? "Sign Up" : "Sign In"}
+      </h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Name"
-          id="name"
-          className="bg-slate-100 p-4 rounded-lg"
-          onChange={handleInput}
-        />
+        {error && (
+          <h1 className="font-semibold text-red-500 text-center">
+            Oops! You've made a mistake!
+          </h1>
+        )}
+        {mode  && (
+          <input
+            type="text"
+            placeholder="Name"
+            id="name"
+            className="bg-slate-100 p-4 rounded-lg"
+            onChange={handleInput}
+            value={formData.name || ""}
+          />
+        )}
+        
         <input
           type="text"
           placeholder="Email"
           id="email"
           className="bg-slate-100 p-4 rounded-lg"
           onChange={handleInput}
+          value={formData.email || ""}
         />
         <input
-          type="text"
+          type="password"
           placeholder="Password"
           id="password"
           className="bg-slate-100 p-4 rounded-lg"
           onChange={handleInput}
+          value={formData.password || ""}
         />
+
+        {mode && (
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            id="confirmPassword"
+            className="bg-slate-100 p-4 rounded-lg"
+            onChange={handleInput}
+            value={formData.confirmPassword || ""}
+          />
+        )}
+
         <button className="bg-cyan-900 text-white p-3 rounded-lg font-semibold uppercase hover:opacity-90">
-          {
-            loading? 'Loading....':'Sign Up'
+          {loading
+          ?'Loading...'
+          :mode
+          ? 'Sign Up'
+          :'Sign In'
           }
         </button>
       </form>
-      <p className="text-red-500 mt-5">{ error && 'Something went wrong!'}</p>
+
+      {error && <p className="text-red-600 mt-5 text-center ">{error}</p>}
+
       <div className=" flex gap-2 mt-5">
         <p>Have an account?</p>
-
-        <span className="text-blue-500" onClick={handleSignin}>Sign In</span>
+        <span className="text-blue-500" onClick={handleSignin}>
+          {
+            mode?'Sign In':'Sign Up'
+          }
+        </span>
       </div>
-      
     </div>
   );
 }
