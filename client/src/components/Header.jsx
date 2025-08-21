@@ -1,7 +1,10 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
+import {useDispatch} from 'react-redux';
+import { toggleSignupModal } from '../features/modals/modalSlice';
+
 
 const Header = () => {
+ const dispatch = useDispatch();
   return (
     <div className='bg-cyan-950 text-white flex justify-around  mx-auto p-5'>
         <Link to='/'>
@@ -11,9 +14,9 @@ const Header = () => {
         <Link to = '/about'>
         <li>About</li>
         </Link>
-        <Link to='/signup'>
-        <li>Signup</li>
-        </Link>
+     
+        <li onClick={()=>dispatch(toggleSignupModal())}>Signup</li>
+      
       </ul>
     </div>
   )
