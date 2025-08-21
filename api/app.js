@@ -4,7 +4,7 @@ import userRouter from './routes/userRoutes.js';
 import userAuth from './authentication/userAuth.js';
 import cors from 'cors';
 import helmet from 'helmet';
-import { customError } from './utils/errorHandling/error.js';
+
 
 dotenv.config();
 
@@ -14,7 +14,8 @@ const clientUrl = process.env.CLIENT_URL
 app.use(express.json())
 
 app.use(cors({
-    origin: clientUrl
+    origin: clientUrl,
+    credentials:true
 }));
 
 app.use(helmet());

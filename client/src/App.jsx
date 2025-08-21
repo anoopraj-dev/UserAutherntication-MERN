@@ -5,6 +5,7 @@ import About from './pages/user/About'
 // import Signup from './pages/user/Signup'
 import Modal from './components/Modal'
 import { useSelector } from 'react-redux'
+import UserHome from './pages/user/UserHome'
 
 const App = () => {
   const { signupModal } = useSelector((state) => state.modal)
@@ -14,11 +15,10 @@ const App = () => {
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />
-        {/* <Route path="/signup" element={<Signup />} /> */}
         <Route path="/about" element={<About />} />
+        <Route path='/user' element={<UserHome/>} />
       </Routes>
 
- 
       {signupModal && (
         <>
           <div className="fixed inset-0 bg-black/30 backdrop-blur-xs z-40"></div>

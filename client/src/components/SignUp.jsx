@@ -1,20 +1,26 @@
-import React from "react";
-import { Link } from "react-router-dom";
+
 import { useState } from "react";
+import { useDispatch} from "react-redux";
+import { setUser } from "../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState(true);
+  const navigate = useNavigate();
 
+
+  const dispatch = useDispatch();
   const handleInput = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const SIGNUP_URL = import.meta.env.VITE_SIGNUP_URL;
+  const SIGNIN_URL = import.meta.env.VITE_SIGNIN_URL
 
-  const handleSubmit = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     try {
@@ -40,7 +46,39 @@ function SignUp() {
     }
   };
 
-  const handleSignin = () => {
+  const handleLogin = async(e)=>{
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError(false);
+
+      const res = await fetch (SIGNIN_URL,{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        credentials:"include",
+        body:JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if(!res.ok){
+        setError(data.message || 'Something went wrong');
+        return;
+      }
+
+      dispatch(setUser({user:data.user, token:data.token}));
+      navigate('/user')
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleToggleSignin = () => {
     setMode((prev)=>!prev);
     setFormData({});
     setError("");
@@ -51,7 +89,7 @@ function SignUp() {
       <h1 className="font-bold text-3xl text-center my-7">
         {mode ? "Sign Up" : "Sign In"}
       </h1>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-4" onSubmit={mode?handleSignUp:handleLogin}>
         {error && (
           <h1 className="font-semibold text-red-500 text-center">
             Oops! You've made a mistake!
@@ -109,8 +147,8 @@ function SignUp() {
       {error && <p className="text-red-600 mt-5 text-center ">{error}</p>}
 
       <div className=" flex gap-2 mt-5">
-        <p>Have an account?</p>
-        <span className="text-blue-500" onClick={handleSignin}>
+        <p>{mode?'Already a member ? ':`Don't have an account ?`}</p>
+        <span className="text-blue-500" onClick={handleToggleSignin}>
           {
             mode?'Sign In':'Sign Up'
           }
